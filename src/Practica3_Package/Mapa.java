@@ -1,28 +1,29 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package Practica3_Package;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 
 /**
- *
- * @author jordi
+ * Clase para manejar los mapas.
  */
 public class Mapa {
 
     private int filas, columnas;
-    private String mapa[][];
+    private String[][] mapa;
 
     public Mapa(String ruta) throws IOException {
         leerFichero(ruta);
     }
 
     private void leerFichero(String ruta) throws IOException {
-        try (BufferedReader br = new BufferedReader(new FileReader(ruta))) {
+        File file = new File(ruta);
+        if (!file.exists()) {
+            throw new IOException("El archivo del mapa no existe: " + ruta);
+        }
+
+        try (BufferedReader br = new BufferedReader(new FileReader(file))) {
             // Leer el número de filas y columnas desde las dos primeras líneas
             filas = Integer.parseInt(br.readLine());
             columnas = Integer.parseInt(br.readLine());
@@ -33,23 +34,14 @@ public class Mapa {
             // Leer la matriz a partir de la línea 3
             for (int i = 0; i < filas; i++) {
                 String linea = br.readLine();
-                String[] elementos = linea.split("\t"); // Suponiendo que los elementos están separados por tabulaciones
-
+                String[] elementos = linea.split("\t"); // Separador: tabulación
                 for (int j = 0; j < columnas; j++) {
                     mapa[i][j] = elementos[j];
                 }
             }
-            /*
-            System.out.println("El mapa leido es \n");
-            for (int i = 0; i < filas; i++) {
-                for (int j = 0; j < columnas; j++) {
-                    System.out.print(mapa[i][j] + "\t");
-                }
-                System.out.println();
-            }*/
-        } 
-        catch (IOException e) {
-            e.printStackTrace();
+        } catch (IOException e) {
+            System.err.println("Error al leer el archivo: " + e.getMessage());
+            throw e;
         }
     }
 
@@ -60,32 +52,24 @@ public class Mapa {
     public int getColumnas() {
         return columnas;
     }
-    
-    public String get(Coordenadas pos){
-        //Comprobamos que la posiicon este en el mapa
-        if(pos.getFila() >= 0 && pos.getFila() < filas && pos.getColumna() < columnas && pos.getColumna() >= 0)
+
+    public String get(Coordenadas pos) {
+        if (pos.getFila() >= 0 && pos.getFila() < filas && pos.getColumna() < columnas && pos.getColumna() >= 0) {
             return mapa[pos.getFila()][pos.getColumna()];
-        else
+        } else {
             return "-1";
-    }
-    
-    // Método para obtener una copia del mapa para visualización
-    public String[][] obtenerCopiaParaVisualizacion() {
-        String[][] mapaVisual = new String[filas][columnas];
-        for (int i = 0; i < filas; i++) {
-            for (int j = 0; j < columnas; j++) {
-                mapaVisual[i][j] = mapa[i][j]; 
-            }
         }
-        return mapaVisual;
     }
-    
-    public int[][] obtenerCopiaMismoTamano(){
-        return new int[filas][columnas]; 
+
+    public String[][] obtenerCopiaParaVisualizacion() {
+        String[][] copia = new String[filas][columnas];
+        for (int i = 0; i < filas; i++) {
+            System.arraycopy(mapa[i], 0, copia[i], 0, columnas);
+        }
+        return copia;
     }
-    
-    
 
-    
-
+    public int[][] obtenerCopiaMismoTamano() {
+        return new int[filas][columnas];
+    }
 }
