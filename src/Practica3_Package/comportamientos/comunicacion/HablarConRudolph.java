@@ -26,28 +26,21 @@ import Practica3_Package.enums.OpcionesSanta;
 public class HablarConRudolph extends CyclicBehaviour {
 
     private Buscador buscador;
-    
 
     public HablarConRudolph(Buscador buscador) {
         this.buscador = buscador;
-        
     }
 
     @Override
     public void action() {
         if(buscador.getComportamieno() == Comportamiento.COMUNICACION_RUDOLPH){
-            // Establecer canal seguro:
             ACLMessage peticion = new ACLMessage(ACLMessage.PROPOSE);
             peticion.addReceiver(new AID("dba_rudolph", AID.ISLOCALNAME));
-            
             peticion.setConversationId(buscador.getCodigo());
             peticion.setContent("Solicitud de participacion");
-
             buscador.send(peticion);
 
-            // Espera de la respuesta:
             ACLMessage respuestaR = buscador.blockingReceive();
-            
             if (respuestaR.getPerformative() == ACLMessage.ACCEPT_PROPOSAL) {
                 peticion = respuestaR.createReply();
                 peticion.setPerformative(ACLMessage.INFORM);
@@ -56,22 +49,18 @@ public class HablarConRudolph extends CyclicBehaviour {
                 buscador.send(peticion);
 
                 respuestaR = buscador.blockingReceive();
-
                 if (respuestaR.getPerformative() == ACLMessage.INFORM) {
                     try {
                         System.out.println("Obtenidas coordenadas del reno");
-                        
-                        //buscador.addBehaviour(new ); Tengo que llamar al método
                         Coordenadas coordenadas = (Coordenadas) respuestaR.getContentObject();
                         buscador.getEntorno().getInterfazMapa().setObjetivoSeleccionado(coordenadas);
                         buscador.setComportamiento(Comportamiento.MOVER);
-                        
+
                     } catch (UnreadableException ex) {
                         Logger.getLogger(HablarConRudolph.class.getName()).log(Level.SEVERE, null, ex);
                     }
                 } else if(respuestaR.getPerformative() == ACLMessage.REFUSE){
                     buscador.setComportamiento(Comportamiento.COMUNICACION_SANTA);                
-                   
                 }
                 else{
                     System.out.println("Rudolph no contesta...");
@@ -81,7 +70,6 @@ public class HablarConRudolph extends CyclicBehaviour {
                 buscador.doDelete();
             }
         }
-       
+        // Aquí quitamos el block() del else y no hacemos nada si no es COMUNICACION_RUDOLPH.
     }
-    
 }

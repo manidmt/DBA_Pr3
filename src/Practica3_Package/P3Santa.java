@@ -22,7 +22,7 @@ public class P3Santa {
         
         ContainerController cc = rt.createAgentContainer(new ProfileImpl());
         
-        AgentController ac = cc.createNewAgent("dba_santa","p2.SantaClaus", null);
+        AgentController ac = cc.createNewAgent("dba_santa","Practica3_Package.SantaClaus", null);
         ac.start();
     }
     

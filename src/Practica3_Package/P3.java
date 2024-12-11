@@ -28,7 +28,7 @@ public class P3 {
         ContainerController cc = rt.createMainContainer(p);
 
         // Creación del agente y paso de la ruta del mapa como argumento
-        AgentController ac = cc.createNewAgent("dba_p3", "Practica3_Package.Buscador", new Object[]{mapaPath});
+        AgentController ac = cc.createNewAgent("dba_buscador", "Practica3_Package.Buscador", new Object[]{mapaPath});
         ac.start();
         
         AgentController ac1 = cc.createNewAgent("dba_santa","Practica3_Package.SantaClaus", null);
@@ -36,5 +36,9 @@ public class P3 {
         
         AgentController ac2 = cc.createNewAgent("dba_rudolph","Practica3_Package.Rudolph", null);
         ac2.start();
+        
+        AgentController ac3 = cc.createNewAgent("dba_traductor","Practica3_Package.Traductor", null);
+        ac3.start();
+       
     }
 }

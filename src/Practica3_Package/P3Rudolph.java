@@ -22,7 +22,7 @@ public class P3Rudolph {
         
         ContainerController cc = rt.createAgentContainer(new ProfileImpl());
         
-        AgentController ac = cc.createNewAgent("dba_rudolph","p2.Rudolph", null);
+        AgentController ac = cc.createNewAgent("dba_rudolph","Practica3_Package.Rudolph", null);
         ac.start();
     }
     

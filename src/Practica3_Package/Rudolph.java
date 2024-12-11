@@ -21,14 +21,14 @@ public class Rudolph extends Agent {
     @Override
     protected void setup() {
         // Inicializa las coordenadas de cada reno
-        renos[0] = new Coordenadas(37, 12); // Coordenadas de Dasher
-        renos[1] = new Coordenadas(20, 12); // Coordenadas de Dancer
-        renos[2] = new Coordenadas(33, 22); // Coordenadas de Vixen
-        renos[3] = new Coordenadas(7, 8); // Coordenadas de Prancer
-        renos[4] = new Coordenadas(21, 9); // Coordenadas de Cupido
-        renos[5] = new Coordenadas(39 ,39); // Coordenadas de Comet
-        renos[6] = new Coordenadas(30, 15); // Coordenadas de blitzen
-        renos[7] = new Coordenadas(15, 15); // Coordenadas de Donner
+        renos[0] = new Coordenadas(47, 12); // Coordenadas de Dasher
+        renos[1] = new Coordenadas(10, 12); // Coordenadas de Dancer
+        renos[2] = new Coordenadas(33, 29); // Coordenadas de Vixen
+        renos[3] = new Coordenadas(7, 18); // Coordenadas de Prancer
+        renos[4] = new Coordenadas(21, 49); // Coordenadas de Cupido
+        renos[5] = new Coordenadas(19 ,39); // Coordenadas de Comet
+        renos[6] = new Coordenadas(1, 15); // Coordenadas de blitzen
+        renos[7] = new Coordenadas(15, 35); // Coordenadas de Donner
         
         System.out.println("Rudolph: Agente inicializado");
 
