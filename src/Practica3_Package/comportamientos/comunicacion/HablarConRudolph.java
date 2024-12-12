@@ -34,6 +34,7 @@ public class HablarConRudolph extends CyclicBehaviour {
     @Override
     public void action() {
         if(buscador.getComportamieno() == Comportamiento.COMUNICACION_RUDOLPH){
+            System.out.println("Bro Hablemos con Rudolph usando el código de Santa. En Plan");
             ACLMessage peticion = new ACLMessage(ACLMessage.PROPOSE);
             peticion.addReceiver(new AID("dba_rudolph", AID.ISLOCALNAME));
             peticion.setConversationId(buscador.getCodigo());
@@ -51,8 +52,8 @@ public class HablarConRudolph extends CyclicBehaviour {
                 respuestaR = buscador.blockingReceive();
                 if (respuestaR.getPerformative() == ACLMessage.INFORM) {
                     try {
-                        System.out.println("Obtenidas coordenadas del reno");
                         Coordenadas coordenadas = (Coordenadas) respuestaR.getContentObject();
+                        System.out.println("Bro Coordenadas del reno recibidas: (" + coordenadas.getFila() + "," + coordenadas.getColumna() + "). ¡Vamos a por él! En Plan");
                         buscador.getEntorno().getInterfazMapa().setObjetivoSeleccionado(coordenadas);
                         buscador.setComportamiento(Comportamiento.MOVER);
 
@@ -60,16 +61,16 @@ public class HablarConRudolph extends CyclicBehaviour {
                         Logger.getLogger(HablarConRudolph.class.getName()).log(Level.SEVERE, null, ex);
                     }
                 } else if(respuestaR.getPerformative() == ACLMessage.REFUSE){
+                    System.out.println("Bro Rudolph dice que ya no hay más renos. En Plan");
                     buscador.setComportamiento(Comportamiento.COMUNICACION_SANTA);                
                 }
                 else{
-                    System.out.println("Rudolph no contesta...");
+                    System.out.println("Bro Rudolph no contesta... En Plan");
                 }
             } else {
-                System.out.println("No se ha podido establecer comunicación con Rudolph.");
+                System.out.println("Bro No se ha podido establecer comunicación con Rudolph. En Plan");
                 buscador.doDelete();
             }
         }
-        // Aquí quitamos el block() del else y no hacemos nada si no es COMUNICACION_RUDOLPH.
     }
 }

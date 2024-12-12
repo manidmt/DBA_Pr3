@@ -26,26 +26,17 @@ public class Moverse extends CyclicBehaviour {
     Coordenadas inicio;
     ArrayList<Casilla> casillas;
     Buscador agente;
-    boolean llamarRudolph;
 
     public Moverse(ArrayList<Casilla> casillas, Buscador agente) {
         this.casillas = casillas;
         this.agente = agente;
-        this.llamarRudolph = false;
-    }
-
-    public Moverse(ArrayList<Casilla> casillas, Buscador agente, Coordenadas objetivo, boolean llamarRudolph) {
-        this.casillas = casillas;
-        this.agente = agente;
-        this.llamarRudolph = llamarRudolph;
-
-        this.agente.getEntorno().getInterfazMapa().setObjetivoSeleccionado(objetivo); //Con esto definimos el objetivo al que va nuestro agente
     }
 
     @Override
     public void action() {
         if (this.agente.getComportamieno() == Comportamiento.MOVER) {
-            while (this.agente.getEntorno().getInterfazMapa().getInicioSeleccionado() == null || this.agente.getEntorno().getInterfazMapa().getObjetivoSeleccionado() == null) {
+            while (this.agente.getEntorno().getInterfazMapa().getInicioSeleccionado() == null 
+                    || this.agente.getEntorno().getInterfazMapa().getObjetivoSeleccionado() == null) {
                 try {
                     Thread.sleep(500);
                 } catch (InterruptedException e) {
@@ -55,15 +46,15 @@ public class Moverse extends CyclicBehaviour {
             if (this.inicio == null) {
                 this.inicio = this.agente.getEntorno().getInterfazMapa().getInicioSeleccionado();
             }
-            
+
             this.objetivo = this.agente.getEntorno().getInterfazMapa().getObjetivoSeleccionado();
             Coordenadas viejaPosicion = this.agente.getEntorno().getPosicion();
             Coordenadas nuevaPosicion = elegirSiguientePosicion(this.agente.getEntorno());
             this.agente.getEntorno().actualizarMapaVeces(viejaPosicion);
-            this.agente.getEntorno().setPosicion(nuevaPosicion); // Actualiza la posición en Entorno
-            actualizarYMostrarMapa(this.agente.getEntorno(), nuevaPosicion, viejaPosicion); // Actualiza el mapa visual
+            this.agente.getEntorno().setPosicion(nuevaPosicion); 
+            actualizarYMostrarMapa(this.agente.getEntorno(), nuevaPosicion, viejaPosicion);
             try {
-                Thread.sleep(200); // Espera de 1 segundo
+                Thread.sleep(200); 
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
@@ -71,21 +62,21 @@ public class Moverse extends CyclicBehaviour {
             this.agente.getEntorno().getInterfazMapa().actualizarContadorPasos(num_pasos);
             boolean resultado = this.agente.getEntorno().getInterfazMapa().getObjetivoSeleccionado().equals(this.agente.getEntorno().getPosicion());
             if (resultado) {
-                System.out.println("Has llegado al destino.\nSe han realizado " + num_pasos + " pasos.");
-                this.inicio =  this.agente.getEntorno().getPosicion();
+                System.out.println("Bro He llegado a mi destino en " + num_pasos + " pasos. En Plan");
+                // Aquí podrías añadir lógica para informar a Santa o a Rudolph si fuese necesario.
+                // Conforme a tu lógica previa, cambia el comportamiento o haz la siguiente acción.
                 agente.setComportamiento(Comportamiento.COMUNICACION_RUDOLPH);
             }
         }
-
     }
 
     private void actualizarYMostrarMapa(Entorno entorno, Coordenadas nuevaPosicion, Coordenadas viejaPosicion) {
         if (viejaPosicion != null) {
-            entorno.marcarPosicion(viejaPosicion, "C"); // Marcar camino recorrido
+            entorno.marcarPosicion(viejaPosicion, "C"); 
         }
 
-        this.agente.getEntorno().marcarPosicion(nuevaPosicion, "X"); // Marcar posición actual del Agente
-        this.agente.getEntorno().marcarPosicion(objetivo, "F"); // Asegurarse de que la meta sigue marcada
+        this.agente.getEntorno().marcarPosicion(nuevaPosicion, "X"); 
+        this.agente.getEntorno().marcarPosicion(objetivo, "F"); 
         this.agente.getEntorno().marcarPosicion(inicio, "I");
         this.agente.getEntorno().actualizarMapaVisual();
     }
@@ -95,23 +86,19 @@ public class Moverse extends CyclicBehaviour {
         double menorDistancia = Double.MAX_VALUE;
         for (Casilla casilla : casillas) {
             if (casilla.see(posActual)) {
-                if (casilla.calcularDistancia(posActual, objetivo, this.agente.getEntorno().getMapaVeces()) < menorDistancia) {
-                    menorDistancia = casilla.calcularDistancia(posActual, objetivo, this.agente.getEntorno().getMapaVeces());
+                double dist = casilla.calcularDistancia(posActual, objetivo, this.agente.getEntorno().getMapaVeces());
+                if (dist < menorDistancia) {
+                    menorDistancia = dist;
                     mejorPosicion = casilla.getPosicion(posActual);
                 }
-
             }
         }
-
         return mejorPosicion;
     }
 
     private Coordenadas elegirSiguientePosicion(Entorno entorno) {
-
         Coordenadas actual = entorno.getPosicion();
-
         actual = rutaNormal(actual);
         return actual;
-
     }
 }

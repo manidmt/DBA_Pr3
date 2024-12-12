@@ -45,12 +45,10 @@ public class HablarConSanta extends CyclicBehaviour {
                 default -> {}
             }
         } 
-        // Quitar el block() del else para que este comportamiento siga ejecutándose
-        // y detecte si en el futuro se cambia a COMUNICACION_SANTA.
     }
 
     private void buscarRenos() {
-        System.out.println("HablarConSanta: Solicitando misión a Santa");
+        System.out.println("Bro Me ofrezco voluntario para la misión. En Plan");
         buscador.setCanalSanta(new ACLMessage(ACLMessage.PROPOSE));
         buscador.getCanalSanta().addReceiver(new AID("dba_traductor", AID.ISLOCALNAME));
         buscador.getCanalSanta().setContent("Bro Me ofrezco voluntario para la misión. En Plan");
@@ -62,21 +60,21 @@ public class HablarConSanta extends CyclicBehaviour {
             content = limpiarFormato(content);
             String codigo = extraerCodigo(content);
             buscador.setCodigo(codigo);
-            System.out.println("¡Santa ha aceptado al agente!\nEl código secreto es " + buscador.getCodigo());
+            System.out.println("Bro ¡Santa me ha aceptado! Tengo el código secreto: " + buscador.getCodigo() + " En Plan");
             opcion = OpcionesSanta.BUSCAR_SANTA;
             buscador.setComportamiento(Comportamiento.COMUNICACION_RUDOLPH);
 
         } else if (respuestaS != null && respuestaS.getPerformative() == ACLMessage.REJECT_PROPOSAL) {
-            System.out.println("Santa no confía en nosotros. Finalizando...");
+            System.out.println("Bro Santa no confía en mí. Fin de la misión. En Plan");
             buscador.doDelete();
         } else {
-            System.out.println("No se recibió respuesta esperada de Santa.");
+            System.out.println("Bro No se recibió respuesta esperada de Santa. En Plan");
             buscador.doDelete();
         }
     }
 
     private void buscarSanta() {
-        // Preguntamos si Santa nos recibe
+        System.out.println("Bro Santa ¿Me recibes? En Plan");
         buscador.getCanalSanta().setPerformative(ACLMessage.REQUEST);
         buscador.getCanalSanta().clearAllReceiver();
         buscador.getCanalSanta().addReceiver(new AID("dba_traductor", AID.ISLOCALNAME));
@@ -85,10 +83,11 @@ public class HablarConSanta extends CyclicBehaviour {
 
         ACLMessage respuestaS = buscador.blockingReceive();
         if (respuestaS != null && respuestaS.getPerformative() == ACLMessage.AGREE) {
-            // Pedimos su ubicación
+            System.out.println("Bro Santa me recibe. Ahora preguntaré su ubicación. En Plan");
             buscador.getCanalSanta().setPerformative(ACLMessage.INFORM);
             buscador.getCanalSanta().clearAllReceiver();
             buscador.getCanalSanta().addReceiver(new AID("dba_traductor", AID.ISLOCALNAME));
+            System.out.println("Bro Santa ¿Dónde estás? En Plan");
             buscador.getCanalSanta().setContent("Bro Santa ¿Dónde estás? En Plan");
             buscador.send(buscador.getCanalSanta());
 
@@ -99,20 +98,22 @@ public class HablarConSanta extends CyclicBehaviour {
                 int col = extraerNumero(cont, "Columna");
                 Coordenadas c = new Coordenadas(fila, col);
                 buscador.getEntorno().getInterfazMapa().setObjetivoSeleccionado(c);
+                System.out.println("Bro Sé dónde está Santa. ¡Allá voy! En Plan");
                 opcion = OpcionesSanta.LLEGAR_DESTINO;
                 buscador.setComportamiento(Comportamiento.MOVER);
             } else {
-                System.out.println("Santa no proporciona su ubicación.");
+                System.out.println("Bro Santa no proporciona su ubicación. En Plan");
                 buscador.doDelete();
             }
 
         } else {
-            System.out.println("Santa no responde a nuestra llamada.");
+            System.out.println("Bro Santa no responde a mi llamada. En Plan");
             buscador.doDelete();
         }
     }
 
     private void llegarDestino() {
+        System.out.println("Bro Misión completada En Plan");
         buscador.getCanalSanta().setPerformative(ACLMessage.INFORM);
         buscador.getCanalSanta().clearAllReceiver();
         buscador.getCanalSanta().addReceiver(new AID("dba_traductor", AID.ISLOCALNAME));
@@ -122,9 +123,9 @@ public class HablarConSanta extends CyclicBehaviour {
         ACLMessage respuestaS = buscador.blockingReceive();
         if (respuestaS != null && respuestaS.getPerformative() == ACLMessage.INFORM) {
             String cont = limpiarFormato(respuestaS.getContent());
-            System.out.println(cont);
+            System.out.println("Bro " + cont + " En Plan");
         } else {
-            System.out.println("Santa no confirma la finalización.");
+            System.out.println("Bro Santa no confirma la finalización. En Plan");
         }
         opcion = OpcionesSanta.BUSCAR_RENOS;
         buscador.setComportamiento(Comportamiento.NADA);

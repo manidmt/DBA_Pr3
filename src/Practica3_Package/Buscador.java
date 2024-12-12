@@ -51,7 +51,7 @@ public class Buscador extends Agent {
     }
 
     public Buscador() throws IOException {
-        Mapa mapa = new Mapa("./Mapas/100x100-sinObstaculos.txt");
+        Mapa mapa = new Mapa("./Mapas/100x100-conObstaculos.txt");
         entorno = new Entorno(mapa, this);
         casillas = new ArrayList<>();
         casillas.add(new Arriba(mapa));
@@ -116,7 +116,7 @@ public class Buscador extends Agent {
 
     @Override
     protected void setup() {
-        System.out.println("Buscador: Agente inicializado");
+        System.out.println("Buscador: Agente listo para ofrecerse voluntario a la misión.");
         addBehaviour(new HablarConSanta(this, OpcionesSanta.BUSCAR_RENOS));
         addBehaviour(new HablarConRudolph(this));
         addBehaviour(new Moverse(casillas, this));
