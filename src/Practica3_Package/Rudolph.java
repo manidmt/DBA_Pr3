@@ -20,12 +20,11 @@ public class Rudolph extends Agent {
 
     @Override
     protected void setup() {
-        // Inicializa las coordenadas de cada reno (ejemplo, puedes mantener las que tenías)
-        renos[0] = new Coordenadas(37, 12); 
+        renos[0] = new Coordenadas(37, 12);
         renos[1] = new Coordenadas(20, 12);
         renos[2] = new Coordenadas(33, 22);
         renos[3] = new Coordenadas(7, 8);
-        renos[4] = new Coordenadas(21, 8);
+        renos[4] = new Coordenadas(21, 9);
         renos[5] = new Coordenadas(39 ,39);
         renos[6] = new Coordenadas(30, 15);
         renos[7] = new Coordenadas(15, 15);
@@ -40,23 +39,17 @@ public class Rudolph extends Agent {
                 if (msg != null) {
                     String content = msg.getContent();
                     if (content.equals("Solicitud de participacion")) {
-                        System.out.println("Rudolph: Código recibido. Validando...");
                         if (esConfiable(msg)) {
                             aceptado = true;
-                            System.out.println("Rudolph: Agente validado por Santa, aceptando propuesta.");
                             enviarRespuesta(msg, ACLMessage.ACCEPT_PROPOSAL, "");
                         } else {
-                            System.out.println("Rudolph: Código incorrecto. Rechazando.");
                             enviarRespuesta(msg, ACLMessage.REJECT_PROPOSAL, "");
                         }
                     } else if (content.equals("coordenada reno") && aceptado) {
-                        System.out.println("Rudolph: Enviando las coordenadas del siguiente reno.");
                         Coordenadas coor = obtenerCoordenadaReno();
                         if (coor != null){
-                            enviarRespuestaCoor(msg , ACLMessage.INFORM , coor);                           
-                        }
-                        else{
-                            System.out.println("Rudolph: Ya se han recuperado todos los renos.");
+                            enviarRespuestaCoor(msg , ACLMessage.INFORM , coor);
+                        } else {
                             enviarRespuesta(msg, ACLMessage.REFUSE, "");
                         }
                     }
@@ -91,7 +84,7 @@ public class Rudolph extends Agent {
 
     private void enviarRespuestaCoor(ACLMessage mensajeEntrante, int performative, Coordenadas coor) {
         ACLMessage respuesta = mensajeEntrante.createReply();
-        respuesta.setPerformative(performative);    
+        respuesta.setPerformative(performative);
         try {
             respuesta.setContentObject(coor);
         } catch (IOException ex) {

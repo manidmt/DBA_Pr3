@@ -26,6 +26,7 @@ import Practica3_Package.enums.OpcionesSanta;
 public class HablarConRudolph extends CyclicBehaviour {
 
     private Buscador buscador;
+    private ACLMessage lastMessageFromRudolph = null;
 
     public HablarConRudolph(Buscador buscador) {
         this.buscador = buscador;
@@ -34,7 +35,7 @@ public class HablarConRudolph extends CyclicBehaviour {
     @Override
     public void action() {
         if(buscador.getComportamieno() == Comportamiento.COMUNICACION_RUDOLPH){
-            System.out.println("Bro Hablemos con Rudolph usando el código de Santa. En Plan");
+            // Primer contacto con Rudolph: crear un mensaje nuevo
             ACLMessage peticion = new ACLMessage(ACLMessage.PROPOSE);
             peticion.addReceiver(new AID("dba_rudolph", AID.ISLOCALNAME));
             peticion.setConversationId(buscador.getCodigo());
@@ -42,14 +43,17 @@ public class HablarConRudolph extends CyclicBehaviour {
             buscador.send(peticion);
 
             ACLMessage respuestaR = buscador.blockingReceive();
+            lastMessageFromRudolph = respuestaR;
+
             if (respuestaR.getPerformative() == ACLMessage.ACCEPT_PROPOSAL) {
-                peticion = respuestaR.createReply();
-                peticion.setPerformative(ACLMessage.INFORM);
-                peticion.setConversationId(buscador.getCodigo());
-                peticion.setContent("coordenada reno");
-                buscador.send(peticion);
+                // Pedir coordenadas del primer reno usando createReply
+                ACLMessage pedirCoor = lastMessageFromRudolph.createReply();
+                pedirCoor.setPerformative(ACLMessage.INFORM);
+                pedirCoor.setContent("coordenada reno");
+                buscador.send(pedirCoor);
 
                 respuestaR = buscador.blockingReceive();
+                lastMessageFromRudolph = respuestaR;
                 if (respuestaR.getPerformative() == ACLMessage.INFORM) {
                     try {
                         Coordenadas coordenadas = (Coordenadas) respuestaR.getContentObject();
@@ -63,8 +67,7 @@ public class HablarConRudolph extends CyclicBehaviour {
                 } else if(respuestaR.getPerformative() == ACLMessage.REFUSE){
                     System.out.println("Bro Rudolph dice que ya no hay más renos. En Plan");
                     buscador.setComportamiento(Comportamiento.COMUNICACION_SANTA);                
-                }
-                else{
+                } else {
                     System.out.println("Bro Rudolph no contesta... En Plan");
                 }
             } else {

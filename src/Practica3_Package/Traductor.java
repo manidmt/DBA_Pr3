@@ -34,7 +34,9 @@ public class Traductor extends Agent {
                         mensajeABuscador.setContent(nuevoContenido);
                         mensajeABuscador.setConversationId(msg.getConversationId());
                         send(mensajeABuscador);
-                    } 
+                    } else {
+                        block();
+                    }
                 } else {
                     block();
                 }

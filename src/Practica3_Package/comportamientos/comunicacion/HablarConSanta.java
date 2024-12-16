@@ -29,6 +29,7 @@ public class HablarConSanta extends CyclicBehaviour {
 
     private Buscador buscador;
     private OpcionesSanta opcion;
+    private ACLMessage lastMessageFromSanta = null;
 
     public HablarConSanta(Buscador buscador, OpcionesSanta opcion) {
         this.buscador = buscador;
@@ -44,17 +45,20 @@ public class HablarConSanta extends CyclicBehaviour {
                 case LLEGAR_DESTINO -> llegarDestino();
                 default -> {}
             }
-        } 
+        }
     }
 
     private void buscarRenos() {
         System.out.println("Bro Me ofrezco voluntario para la misión. En Plan");
-        buscador.setCanalSanta(new ACLMessage(ACLMessage.PROPOSE));
-        buscador.getCanalSanta().addReceiver(new AID("dba_traductor", AID.ISLOCALNAME));
-        buscador.getCanalSanta().setContent("Bro Me ofrezco voluntario para la misión. En Plan");
-        buscador.send(buscador.getCanalSanta());
+        // Primer mensaje a Santa: no hay uno previo, se crea uno nuevo
+        ACLMessage primerMensaje = new ACLMessage(ACLMessage.PROPOSE);
+        primerMensaje.addReceiver(new AID("dba_traductor", AID.ISLOCALNAME));
+        primerMensaje.setContent("Bro Me ofrezco voluntario para la misión. En Plan");
+        buscador.send(primerMensaje);
 
         ACLMessage respuestaS = buscador.blockingReceive();
+        lastMessageFromSanta = respuestaS;
+
         if (respuestaS != null && respuestaS.getPerformative() == ACLMessage.ACCEPT_PROPOSAL) {
             String content = respuestaS.getContent();
             content = limpiarFormato(content);
@@ -74,24 +78,25 @@ public class HablarConSanta extends CyclicBehaviour {
     }
 
     private void buscarSanta() {
-        System.out.println("Bro Santa ¿Me recibes? En Plan");
-        buscador.getCanalSanta().setPerformative(ACLMessage.REQUEST);
-        buscador.getCanalSanta().clearAllReceiver();
-        buscador.getCanalSanta().addReceiver(new AID("dba_traductor", AID.ISLOCALNAME));
-        buscador.getCanalSanta().setContent("Bro Santa ¿Me recibes? En Plan");
-        buscador.send(buscador.getCanalSanta());
+        // Ahora ya tenemos un mensaje previo de Santa (lastMessageFromSanta)
+        // Preguntamos si Santa nos recibe usando createReply
+        ACLMessage preguntaRecibe = lastMessageFromSanta.createReply();
+        preguntaRecibe.setPerformative(ACLMessage.REQUEST);
+        preguntaRecibe.setContent("Bro Santa ¿Me recibes? En Plan");
+        buscador.send(preguntaRecibe);
 
         ACLMessage respuestaS = buscador.blockingReceive();
+        lastMessageFromSanta = respuestaS;
         if (respuestaS != null && respuestaS.getPerformative() == ACLMessage.AGREE) {
             System.out.println("Bro Santa me recibe. Ahora preguntaré su ubicación. En Plan");
-            buscador.getCanalSanta().setPerformative(ACLMessage.INFORM);
-            buscador.getCanalSanta().clearAllReceiver();
-            buscador.getCanalSanta().addReceiver(new AID("dba_traductor", AID.ISLOCALNAME));
-            System.out.println("Bro Santa ¿Dónde estás? En Plan");
-            buscador.getCanalSanta().setContent("Bro Santa ¿Dónde estás? En Plan");
-            buscador.send(buscador.getCanalSanta());
+
+            ACLMessage preguntaUbicacion = lastMessageFromSanta.createReply();
+            preguntaUbicacion.setPerformative(ACLMessage.INFORM);
+            preguntaUbicacion.setContent("Bro Santa ¿Dónde estás? En Plan");
+            buscador.send(preguntaUbicacion);
 
             respuestaS = buscador.blockingReceive();
+            lastMessageFromSanta = respuestaS;
             if (respuestaS != null && respuestaS.getPerformative() == ACLMessage.INFORM) {
                 String cont = limpiarFormato(respuestaS.getContent());
                 int fila = extraerNumero(cont, "Fila");
@@ -113,14 +118,14 @@ public class HablarConSanta extends CyclicBehaviour {
     }
 
     private void llegarDestino() {
-        System.out.println("Bro Misión completada En Plan");
-        buscador.getCanalSanta().setPerformative(ACLMessage.INFORM);
-        buscador.getCanalSanta().clearAllReceiver();
-        buscador.getCanalSanta().addReceiver(new AID("dba_traductor", AID.ISLOCALNAME));
-        buscador.getCanalSanta().setContent("Bro Misión completada En Plan");
-        buscador.send(buscador.getCanalSanta());
+        // Al llegar a Santa, informamos con createReply del último mensaje
+        ACLMessage msgFinal = lastMessageFromSanta.createReply();
+        msgFinal.setPerformative(ACLMessage.INFORM);
+        msgFinal.setContent("Bro Misión completada En Plan");
+        buscador.send(msgFinal);
 
         ACLMessage respuestaS = buscador.blockingReceive();
+        lastMessageFromSanta = respuestaS;
         if (respuestaS != null && respuestaS.getPerformative() == ACLMessage.INFORM) {
             String cont = limpiarFormato(respuestaS.getContent());
             System.out.println("Bro " + cont + " En Plan");

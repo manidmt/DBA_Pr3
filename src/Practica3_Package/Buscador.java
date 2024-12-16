@@ -116,7 +116,7 @@ public class Buscador extends Agent {
 
     @Override
     protected void setup() {
-        System.out.println("Buscador: Agente listo para ofrecerse voluntario a la misión.");
+        System.out.println("Buscador: Agente inicializado");
         addBehaviour(new HablarConSanta(this, OpcionesSanta.BUSCAR_RENOS));
         addBehaviour(new HablarConRudolph(this));
         addBehaviour(new Moverse(casillas, this));
